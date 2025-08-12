@@ -14,11 +14,78 @@
   .preview { width: 842px; max-width: 100%; }
   .preview .section { margin-bottom: 12px; }
   .preview .muted { color: #6b7280; font-size: 13px; }
-  .design-clean { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; color: #0f172a; }
-  .design-clean .name { font-size: 26px; font-weight: 700; }
-  .design-clean .title { color: #374151; }
+  /* DESIGN STYLES */
+  .design-clean {
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: white;
+  }
+  .design-clean .name {
+    font-weight: 700;
+  }
+  .design-clean .title {
+  }
+
+  .design-modern {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f9ff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  .design-modern .name {
+    font-weight: 800;
+    border-bottom: 3px solid currentColor;
+    padding-bottom: 6px;
+  }
+  .design-modern .title {
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  .design-modern .muted {
+  }
+  .design-modern .section {
+    margin-bottom: 18px;
+    border-left: 4px solid currentColor;
+    padding-left: 12px;
+  }
+
+  .design-classic {
+    font-family: Georgia, serif;
+    background: #fffef8;
+    padding: 20px;
+    border: 1px solid #ccc;
+  }
+  .design-classic .name {
+    font-weight: bold;
+    font-style: italic;
+  }
+  .design-classic .title {
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .design-classic .muted {
+    font-style: italic;
+  }
+  .design-classic .section {
+    margin-bottom: 14px;
+    border-bottom: 1px dotted #ccc;
+    padding-bottom: 8px;
+  }
+
   .remove-btn { background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 6px; cursor: pointer; border: none; }
   .add-btn { background: #e6f9f0; color: #065f46; padding: 6px 10px; border-radius: 6px; cursor: pointer; border: none; }
+
+  /* Tag styles */
+  .tag-skills {
+    background-color: #bfdbfe; color: #1e40af;
+    display: inline-block; padding: 2px 6px; margin: 2px 4px 2px 0;
+    border-radius: 6px; font-size: 0.75rem;
+  }
+  .tag-certs {
+    background-color: #bbf7d0; color: #15803d;
+    display: inline-block; padding: 2px 6px; margin: 2px 4px 2px 0;
+    border-radius: 6px; font-size: 0.75rem;
+  }
 </style>
 </head>
 <body class="bg-gray-50 p-6">
@@ -30,14 +97,15 @@
     document.body.innerHTML = "<h2>Access denied</h2>";
   }
 </script>
-  
+
+
 <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
   <!-- LEFT: Form -->
-  <div class="p-4 bg-white rounded shadow">
+  <div class="p-4 bg-white rounded shadow overflow-auto max-h-screen">
     <h2 class="text-2xl font-semibold mb-3">Build your custom resume</h2>
     <p class="text-sm text-gray-600 mb-4">Fill fields — preview updates live. Add/remove entries as needed. When finished, download PDF.</p>
 
-    <div class="space-y-3">
+    <div class="space-y-3 max-w-md">
       <label class="block"><span class="text-sm font-medium">Full name</span>
         <input id="fullName" class="mt-1 block w-full border rounded p-2" placeholder="Jane Doe" />
       </label>
@@ -89,6 +157,51 @@
         <input id="certs" class="mt-1 block w-full border rounded p-2" placeholder="RN — State Board, BLS, ACLS" />
       </label>
 
+      <!-- FONT FAMILY SELECTOR -->
+      <label class="block"><span class="text-sm font-medium">Font Family</span>
+        <select id="fontFamilySelector" class="mt-1 block w-full border rounded p-2">
+          <option value="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" selected>Inter (default)</option>
+          <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Courier New', Courier, monospace">Courier New (monospace)</option>
+          <option value="Arial, sans-serif">Arial</option>
+        </select>
+      </label>
+
+      <!-- FONT SIZE INPUTS -->
+      <label class="block"><span class="text-sm font-medium">Font Size: Name (px)</span>
+        <input id="fontSizeName" type="number" min="14" max="48" step="1" value="26" class="mt-1 block w-full border rounded p-2" />
+      </label>
+      <label class="block"><span class="text-sm font-medium">Font Size: Section Headers (px)</span>
+        <input id="fontSizeHeaders" type="number" min="12" max="36" step="1" value="18" class="mt-1 block w-full border rounded p-2" />
+      </label>
+      <label class="block"><span class="text-sm font-medium">Font Size: Body Text (px)</span>
+        <input id="fontSizeBody" type="number" min="10" max="24" step="1" value="16" class="mt-1 block w-full border rounded p-2" />
+      </label>
+
+      <!-- COLOR PICKERS -->
+      <label class="block"><span class="text-sm font-medium">Color: Name</span>
+        <input type="color" id="colorName" class="mt-1 w-16 h-8 p-0 border rounded" value="#0f172a" />
+      </label>
+      <label class="block"><span class="text-sm font-medium">Color: Title</span>
+        <input type="color" id="colorTitle" class="mt-1 w-16 h-8 p-0 border rounded" value="#374151" />
+      </label>
+      <label class="block"><span class="text-sm font-medium">Color: Section Headers</span>
+        <input type="color" id="colorHeaders" class="mt-1 w-16 h-8 p-0 border rounded" value="#1e40af" />
+      </label>
+      <label class="block"><span class="text-sm font-medium">Color: Body Text</span>
+        <input type="color" id="colorBody" class="mt-1 w-16 h-8 p-0 border rounded" value="#1f2937" />
+      </label>
+
+      <!-- DESIGN SELECTOR -->
+      <label class="block"><span class="text-sm font-medium">Select Resume Design</span>
+        <select id="designSelector" class="mt-1 block w-full border rounded p-2">
+          <option value="design-clean">Clean</option>
+          <option value="design-modern">Modern</option>
+          <option value="design-classic">Classic</option>
+        </select>
+      </label>
+
       <div class="flex gap-3 mt-3">
         <button id="downloadBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Download PDF</button>
         <button id="printBtn" class="px-4 py-2 border rounded">Print</button>
@@ -97,15 +210,15 @@
   </div>
 
   <!-- RIGHT: Live Preview -->
-  <div class="p-4">
+  <div class="p-4 overflow-auto max-h-screen">
     <h3 class="text-lg font-semibold mb-3">Live preview</h3>
-    <div id="resumePreview" class="bg-white p-6 rounded shadow preview design-clean" style="min-height:600px; font-family:Inter,sans-serif;">
+    <div id="resumePreview" class="bg-white p-6 rounded shadow preview design-clean" style="min-height:600px; font-family:Inter,sans-serif; font-size:16px; color:#1f2937;">
       <div class="flex justify-between items-start">
         <div>
-          <div id="prevFullName" class="name" style="font-size:26px;font-weight:700;">Your Name</div>
-          <div id="prevTitle" class="title muted" style="color:#374151;margin-bottom:10px;">Professional Title</div>
+          <div id="prevFullName" class="name" style="font-weight:700; font-size:26px; color:#0f172a;">Your Name</div>
+          <div id="prevTitle" class="title muted" style="color:#374151; margin-bottom:10px;">Professional Title</div>
         </div>
-        <div class="text-sm text-right muted" style="color:#6b7280;font-size:13px;">
+        <div class="text-sm text-right muted" style="color:#6b7280; font-size:13px;">
           <div id="prevCityState"></div>
           <div id="prevEmail"></div>
           <div id="prevPhone"></div>
@@ -115,24 +228,24 @@
       <hr class="my-4">
 
       <section id="prevSummarySec" class="mb-4 hidden">
-        <h4 class="font-semibold">Summary</h4>
-        <div id="prevSummary" class="content"></div>
+        <h4 class="font-semibold" style="font-size:18px; color:#1e40af;">Summary</h4>
+        <div id="prevSummary" class="content" style="color:#1f2937; font-size:16px;"></div>
       </section>
 
       <section id="prevExperienceSec" class="mb-4 hidden">
-        <h4 class="font-semibold">Work Experience</h4>
-        <div id="prevExperience" class="content"></div>
+        <h4 class="font-semibold" style="font-size:18px; color:#1e40af;">Work Experience</h4>
+        <div id="prevExperience" class="content" style="color:#1f2937; font-size:16px;"></div>
       </section>
 
       <section id="prevEducationSec" class="mb-4 hidden">
-        <h4 class="font-semibold">Education</h4>
-        <div id="prevEducation" class="content"></div>
+        <h4 class="font-semibold" style="font-size:18px; color:#1e40af;">Education</h4>
+        <div id="prevEducation" class="content" style="color:#1f2937; font-size:16px;"></div>
       </section>
 
-      <section id="prevSkillsCertSec" class="mb-4 hidden">
+      <section id="prevSkillsCertSec" class="mb-4 hidden" style="color:#1f2937; font-size:16px;">
         <div class="grid grid-cols-2 gap-4">
-          <div id="skillsCol" class="hidden"><h4 class="font-semibold">Skills</h4><div id="prevSkills"></div></div>
-          <div id="certsCol" class="hidden"><h4 class="font-semibold">Certifications</h4><div id="prevCertifications"></div></div>
+          <div id="skillsCol" class="hidden"><h4 class="font-semibold" style="font-size:18px; color:#1e40af;">Skills</h4><div id="prevSkills"></div></div>
+          <div id="certsCol" class="hidden"><h4 class="font-semibold" style="font-size:18px; color:#1e40af;">Certifications</h4><div id="prevCertifications"></div></div>
         </div>
       </section>
 
@@ -212,24 +325,39 @@ function createEduItem(data = {}) {
   return wrapper;
 }
 
-function addInitialItems() {
-  for(let i=0; i<3; i++) workList.appendChild(createWorkItem());
-  for(let i=0; i<3; i++) eduList.appendChild(createEduItem());
-}
-
-addInitialItems();
-
 document.getElementById('addWorkBtn').addEventListener('click', () => {
-  const newItem = createWorkItem();
-  workList.appendChild(newItem);
-  newItem.scrollIntoView({behavior:'smooth', block:'center'});
+  workList.appendChild(createWorkItem());
+  updatePreview();
 });
 
 document.getElementById('addEduBtn').addEventListener('click', () => {
-  const newItem = createEduItem();
-  eduList.appendChild(newItem);
-  newItem.scrollIntoView({behavior:'smooth', block:'center'});
+  eduList.appendChild(createEduItem());
+  updatePreview();
 });
+
+const preview = {
+  previewRoot: document.getElementById('resumePreview'),
+  fullName: document.getElementById('prevFullName'),
+  title: document.getElementById('prevTitle'),
+  email: document.getElementById('prevEmail'),
+  phone: document.getElementById('prevPhone'),
+  cityState: document.getElementById('prevCityState'),
+
+  summarySec: document.getElementById('prevSummarySec'),
+  summary: document.getElementById('prevSummary'),
+
+  experienceSec: document.getElementById('prevExperienceSec'),
+  experience: document.getElementById('prevExperience'),
+
+  educationSec: document.getElementById('prevEducationSec'),
+  education: document.getElementById('prevEducation'),
+
+  skillsSec: document.getElementById('prevSkillsCertSec'),
+  skillsCol: document.getElementById('skillsCol'),
+  certsCol: document.getElementById('certsCol'),
+  skills: document.getElementById('prevSkills'),
+  certs: document.getElementById('prevCertifications'),
+};
 
 const resumeFormElements = {
   fullName: document.getElementById('fullName'),
@@ -240,173 +368,223 @@ const resumeFormElements = {
   summary: document.getElementById('summary'),
   skills: document.getElementById('skills'),
   certs: document.getElementById('certs'),
+  designSelect: document.getElementById('designSelector'),
+  fontFamilySelector: document.getElementById('fontFamilySelector'),
+  fontSizeName: document.getElementById('fontSizeName'),
+  fontSizeHeaders: document.getElementById('fontSizeHeaders'),
+  fontSizeBody: document.getElementById('fontSizeBody'),
+  colorName: document.getElementById('colorName'),
+  colorTitle: document.getElementById('colorTitle'),
+  colorHeaders: document.getElementById('colorHeaders'),
+  colorBody: document.getElementById('colorBody'),
   downloadBtn: document.getElementById('downloadBtn'),
   printBtn: document.getElementById('printBtn'),
-  designSelect: document.getElementById('designSelect')
-};
-
-const preview = {
-  fullName: document.getElementById('prevFullName'),
-  title: document.getElementById('prevTitle'),
-  email: document.getElementById('prevEmail'),
-  phone: document.getElementById('prevPhone'),
-  cityState: document.getElementById('prevCityState'),
-  summarySec: document.getElementById('prevSummarySec'),
-  summary: document.getElementById('prevSummary'),
-  experienceSec: document.getElementById('prevExperienceSec'),
-  experience: document.getElementById('prevExperience'),
-  educationSec: document.getElementById('prevEducationSec'),
-  education: document.getElementById('prevEducation'),
-  skillsSec: document.getElementById('prevSkillsCertSec'),
-  skills: document.getElementById('prevSkills'),
-  certs: document.getElementById('prevCertifications'),
-  skillsCol: document.getElementById('skillsCol'),
-  certsCol: document.getElementById('certsCol'),
-  previewRoot: document.getElementById('resumePreview')
 };
 
 function updatePreview() {
+  // Name & Title text + colors + sizes
   preview.fullName.textContent = resumeFormElements.fullName.value.trim() || 'Your Name';
+  preview.fullName.style.color = resumeFormElements.colorName.value;
+  preview.fullName.style.fontSize = resumeFormElements.fontSizeName.value + 'px';
+
   preview.title.textContent = resumeFormElements.title.value.trim() || 'Professional Title';
+  preview.title.style.color = resumeFormElements.colorTitle.value;
+  preview.title.style.fontSize = (parseInt(resumeFormElements.fontSizeHeaders.value) - 4) + 'px'; // slightly smaller than headers
+
+  // Contact fields text and visibility
   preview.email.textContent = resumeFormElements.email.value.trim();
   preview.phone.textContent = resumeFormElements.phone.value.trim();
   preview.cityState.textContent = resumeFormElements.cityState.value.trim();
 
+  preview.email.style.display = preview.email.textContent ? 'block' : 'none';
+  preview.phone.style.display = preview.phone.textContent ? 'block' : 'none';
+  preview.cityState.style.display = preview.cityState.textContent ? 'block' : 'none';
+
+  preview.email.style.color = resumeFormElements.colorBody.value;
+  preview.phone.style.color = resumeFormElements.colorBody.value;
+  preview.cityState.style.color = resumeFormElements.colorBody.value;
+  preview.email.style.fontSize = resumeFormElements.fontSizeBody.value + 'px';
+  preview.phone.style.fontSize = resumeFormElements.fontSizeBody.value + 'px';
+  preview.cityState.style.fontSize = resumeFormElements.fontSizeBody.value + 'px';
+
   // Summary
   const summaryVal = resumeFormElements.summary.value.trim();
-  preview.summary.textContent = summaryVal;
-  preview.summarySec.classList.toggle('hidden', !summaryVal);
+  if (summaryVal) {
+    preview.summarySec.classList.remove('hidden');
+    preview.summary.textContent = summaryVal;
+    preview.summary.style.color = resumeFormElements.colorBody.value;
+    preview.summary.style.fontSize = resumeFormElements.fontSizeBody.value + 'px';
+    preview.summarySec.querySelector('h4').style.color = resumeFormElements.colorHeaders.value;
+    preview.summarySec.querySelector('h4').style.fontSize = resumeFormElements.fontSizeHeaders.value + 'px';
+  } else {
+    preview.summarySec.classList.add('hidden');
+  }
 
   // Work Experience
   const workNodes = Array.from(workList.children);
-  let workHtmlParts = [];
-  workNodes.forEach(node => {
-    const get = f => node.querySelector(`[data-field="${f}"]`)?.value.trim() || '';
-    const title = get('title');
-    const employer = get('employer');
-    const start = get('start');
-    const end = get('end');
-    const cityState = get('cityState');
-    const desc = get('description');
+  if (workNodes.length > 0) {
+    preview.experienceSec.classList.remove('hidden');
+    preview.experience.innerHTML = '';
+    preview.experienceSec.querySelector('h4').style.color = resumeFormElements.colorHeaders.value;
+    preview.experienceSec.querySelector('h4').style.fontSize = resumeFormElements.fontSizeHeaders.value + 'px';
 
-    if (!title && !employer && !start && !end && !cityState && !desc) return;
+    workNodes.forEach(node => {
+      const title = node.querySelector('input[data-field="title"]').value.trim();
+      const employer = node.querySelector('input[data-field="employer"]').value.trim();
+      const start = node.querySelector('input[data-field="start"]').value.trim();
+      const end = node.querySelector('input[data-field="end"]').value.trim();
+      const cityState = node.querySelector('input[data-field="cityState"]').value.trim();
+      const desc = node.querySelector('textarea[data-field="description"]').value.trim();
 
-    let part = '<div class="section">';
-    if (title || employer) {
-      part += `<div><strong>${escapeHtml(title||'')}</strong>${title && employer ? ' — ' : ''}${escapeHtml(employer||'')}</div>`;
-    }
-    if (start || end || cityState) {
-      const period = [start||'', end||''].filter(Boolean).join(' – ');
-      part += `<div class="muted">${escapeHtml(period)}${(period && cityState) ? ', ' : ''}${escapeHtml(cityState||'')}</div>`;
-    }
-    if (desc) {
-      part += `<div style="margin-top:6px;">${escapeHtml(desc)}</div>`;
-    }
-    part += '</div>';
-    workHtmlParts.push(part);
-  });
-  preview.experience.innerHTML = workHtmlParts.join('');
-  preview.experienceSec.classList.toggle('hidden', workHtmlParts.length === 0);
+      if (!title && !employer && !desc) return; // skip empty
+
+      const jobDiv = document.createElement('div');
+      jobDiv.className = 'section';
+
+      let headerText = '';
+      if (title) headerText += `<strong style="color:${resumeFormElements.colorTitle.value}; font-size:${resumeFormElements.fontSizeHeaders.value}px;">${escapeHtml(title)}</strong>`;
+      if (employer) headerText += (title ? ', ' : '') + `<span style="color:${resumeFormElements.colorBody.value}; font-size:${resumeFormElements.fontSizeBody.value}px;">${escapeHtml(employer)}</span>`;
+      if (start || end) headerText += ' (' + escapeHtml(start || '') + ' - ' + escapeHtml(end || '') + ')';
+      if (cityState) headerText += ', ' + escapeHtml(cityState);
+
+      jobDiv.innerHTML = `
+        <div>${headerText}</div>
+        ${desc ? `<div class="muted" style="margin-top:4px; color:${resumeFormElements.colorBody.value}; font-size:${resumeFormElements.fontSizeBody.value}px;">${escapeHtml(desc)}</div>` : ''}
+      `;
+      preview.experience.appendChild(jobDiv);
+    });
+  } else {
+    preview.experienceSec.classList.add('hidden');
+  }
 
   // Education
   const eduNodes = Array.from(eduList.children);
-  let eduHtmlParts = [];
-  eduNodes.forEach(node => {
-    const get = f => node.querySelector(`[data-field="${f}"]`)?.value.trim() || '';
-    const degree = get('degree');
-    const institution = get('institution');
-    const start = get('start');
-    const end = get('end');
-    const cityState = get('cityState');
-    const desc = get('description');
+  if (eduNodes.length > 0) {
+    preview.educationSec.classList.remove('hidden');
+    preview.education.innerHTML = '';
+    preview.educationSec.querySelector('h4').style.color = resumeFormElements.colorHeaders.value;
+    preview.educationSec.querySelector('h4').style.fontSize = resumeFormElements.fontSizeHeaders.value + 'px';
 
-    if (!degree && !institution && !start && !end && !cityState && !desc) return;
+    eduNodes.forEach(node => {
+      const degree = node.querySelector('input[data-field="degree"]').value.trim();
+      const institution = node.querySelector('input[data-field="institution"]').value.trim();
+      const start = node.querySelector('input[data-field="start"]').value.trim();
+      const end = node.querySelector('input[data-field="end"]').value.trim();
+      const cityState = node.querySelector('input[data-field="cityState"]').value.trim();
+      const desc = node.querySelector('textarea[data-field="description"]').value.trim();
 
-    let part = '<div class="section">';
-    if (degree || institution) {
-      part += `<div><strong>${escapeHtml(degree||'')}</strong>${degree && institution ? ' — ' : ''}${escapeHtml(institution||'')}</div>`;
-    }
-    if (start || end || cityState) {
-      const period = [start||'', end||''].filter(Boolean).join(' – ');
-      part += `<div class="muted">${escapeHtml(period)}${(period && cityState) ? ', ' : ''}${escapeHtml(cityState||'')}</div>`;
-    }
-    if (desc) {
-      part += `<div style="margin-top:6px;">${escapeHtml(desc)}</div>`;
-    }
-    part += '</div>';
-    eduHtmlParts.push(part);
-  });
-  preview.education.innerHTML = eduHtmlParts.join('');
-  preview.educationSec.classList.toggle('hidden', eduHtmlParts.length === 0);
+      if (!degree && !institution) return;
+
+      const eduDiv = document.createElement('div');
+      eduDiv.className = 'section';
+
+      let headerText = '';
+      if (degree) headerText += `<strong style="color:${resumeFormElements.colorTitle.value}; font-size:${resumeFormElements.fontSizeHeaders.value}px;">${escapeHtml(degree)}</strong>`;
+      if (institution) headerText += (degree ? ', ' : '') + `<span style="color:${resumeFormElements.colorBody.value}; font-size:${resumeFormElements.fontSizeBody.value}px;">${escapeHtml(institution)}</span>`;
+      if (start || end) headerText += ' (' + escapeHtml(start || '') + ' - ' + escapeHtml(end || '') + ')';
+      if (cityState) headerText += ', ' + escapeHtml(cityState);
+
+      eduDiv.innerHTML = `
+        <div>${headerText}</div>
+        ${desc ? `<div class="muted" style="margin-top:4px; color:${resumeFormElements.colorBody.value}; font-size:${resumeFormElements.fontSizeBody.value}px;">${escapeHtml(desc)}</div>` : ''}
+      `;
+      preview.education.appendChild(eduDiv);
+    });
+  } else {
+    preview.educationSec.classList.add('hidden');
+  }
 
   // Skills & Certifications
-  const skillsArr = resumeFormElements.skills.value.split(',').map(s=>s.trim()).filter(Boolean);
-  const certsArr = resumeFormElements.certs.value.split(',').map(s=>s.trim()).filter(Boolean);
+  const skillsVal = resumeFormElements.skills.value.trim();
+  const certsVal = resumeFormElements.certs.value.trim();
 
-  if (skillsArr.length) {
-    preview.skills.innerHTML = skillsArr.map(s => `<div>• ${escapeHtml(s)}</div>`).join('');
-    preview.skillsCol.classList.remove('hidden');
+  if (skillsVal || certsVal) {
+    preview.skillsSec.classList.remove('hidden');
+    preview.skillsSec.querySelectorAll('h4').forEach(h => {
+      h.style.color = resumeFormElements.colorHeaders.value;
+      h.style.fontSize = resumeFormElements.fontSizeHeaders.value + 'px';
+    });
+
+    if (skillsVal) {
+      preview.skillsCol.classList.remove('hidden');
+      preview.skills.innerHTML = '';
+      const skillsArr = skillsVal.split(',').map(s => s.trim()).filter(Boolean);
+      skillsArr.forEach(s => {
+        const span = document.createElement('span');
+        span.textContent = s;
+        span.className = 'tag-skills';
+        preview.skills.appendChild(span);
+      });
+    } else {
+      preview.skillsCol.classList.add('hidden');
+      preview.skills.innerHTML = '';
+    }
+
+    if (certsVal) {
+      preview.certsCol.classList.remove('hidden');
+      preview.certs.innerHTML = '';
+      const certsArr = certsVal.split(',').map(s => s.trim()).filter(Boolean);
+      certsArr.forEach(c => {
+        const span = document.createElement('span');
+        span.textContent = c;
+        span.className = 'tag-certs';
+        preview.certs.appendChild(span);
+      });
+    } else {
+      preview.certsCol.classList.add('hidden');
+      preview.certs.innerHTML = '';
+    }
   } else {
-    preview.skillsCol.classList.add('hidden');
+    preview.skillsSec.classList.add('hidden');
   }
 
-  if (certsArr.length) {
-    preview.certs.innerHTML = certsArr.map(s => `<div>• ${escapeHtml(s)}</div>`).join('');
-    preview.certsCol.classList.remove('hidden');
-  } else {
-    preview.certsCol.classList.add('hidden');
-  }
+  // Apply font family and design style class to preview root
+  preview.previewRoot.style.fontFamily = resumeFormElements.fontFamilySelector.value;
+  preview.previewRoot.className = 'bg-white p-6 rounded shadow preview ' + resumeFormElements.designSelect.value;
 
-  preview.skillsSec.classList.toggle('hidden', !skillsArr.length && !certsArr.length);
 }
 
-// Attach main inputs event listeners
 Object.values(resumeFormElements).forEach(el => {
-  if (el && el.tagName !== 'BUTTON') el.addEventListener('input', updatePreview);
+  if (!el) return;
+  if (['SELECT','INPUT','TEXTAREA'].includes(el.tagName)) {
+    el.addEventListener('input', updatePreview);
+    el.addEventListener('change', updatePreview);
+  }
 });
 
-// Initial render
 updatePreview();
 
-document.getElementById('downloadBtn').addEventListener('click', async () => {
-  const previewRoot = preview.previewRoot;
-  previewRoot.scrollTop = 0;
+// DOWNLOAD PDF
+resumeFormElements.downloadBtn.addEventListener('click', async () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    unit: 'pt',
+    format: 'a4'
+  });
 
-  const canvas = await html2canvas(previewRoot, { scale: 2 });
+  // Clone preview, scale for PDF width ~595pt (A4)
+  const clone = preview.previewRoot.cloneNode(true);
+  clone.style.width = '595px';
+  clone.style.fontFamily = preview.previewRoot.style.fontFamily;
+
+  document.body.appendChild(clone);
+  await new Promise(r => setTimeout(r, 200));
+
+  const canvas = await html2canvas(clone, { scale: 2 });
   const imgData = canvas.toDataURL('image/png');
 
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('p', 'pt', 'a4');
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 20;
-  const imgWidth = pageWidth - margin * 2;
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  doc.addImage(imgData, 'PNG', 20, 20, 555, (canvas.height * 555) / canvas.width);
 
-  let heightLeft = imgHeight;
-  let position = margin;
+  doc.save('nurse-resume.pdf');
 
-  pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;
-
-  while (heightLeft > 0) {
-    pdf.addPage();
-    position = heightLeft - imgHeight + margin;
-    pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-  }
-
-  pdf.save((resumeFormElements.fullName.value.trim() || 'resume') + '-nurse.pdf');
+  clone.remove();
 });
 
-document.getElementById('printBtn').addEventListener('click', () => {
-  const printWindow = window.open('', '_blank', 'width=900,height=700');
-  if (!printWindow) {
-    alert('Pop-up blocked! Please allow pop-ups and try again.');
-    return;
-  }
+// PRINT
+resumeFormElements.printBtn.addEventListener('click', () => {
+  const printWindow = window.open('', '_blank');
   printWindow.document.write('<html><head><title>Print Resume</title>');
-  printWindow.document.write('<style>body{font-family:Inter,sans-serif;margin:40px;} .name{font-size:26px;font-weight:700;} .title{color:#374151;margin-bottom:10px;} .muted{color:#6b7280;font-size:13px;} .section{margin-bottom:12px;} h4{font-weight:600;margin-bottom:8px;}</style>');
+  printWindow.document.write(`<style>body{margin:1cm; font-family:${preview.previewRoot.style.fontFamily}; color:${resumeFormElements.colorBody.value}; font-size:${resumeFormElements.fontSizeBody.value}px;} h4, .name, .title { color: ${resumeFormElements.colorHeaders.value} }</style>`);
   printWindow.document.write('</head><body>');
   printWindow.document.write(preview.previewRoot.innerHTML);
   printWindow.document.write('</body></html>');
