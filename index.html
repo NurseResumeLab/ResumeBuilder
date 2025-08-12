@@ -5,16 +5,91 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Nurse Resume Lab — Resume Builder</title>
 
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
-    #content { display: none; }
-    #error { color: red; display: none; margin-top: 10px; }
-  </style>
-  
+  .preview { width: 842px; max-width: 100%; }
+  .preview .section { margin-bottom: 12px; }
+  .preview .muted { color: #6b7280; font-size: 13px; }
+  /* DESIGN STYLES */
+  .design-clean {
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: white;
+  }
+  .design-clean .name { font-weight: 700; }
+  .design-modern {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f9ff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  .design-modern .name {
+    font-weight: 800;
+    border-bottom: 3px solid currentColor;
+    padding-bottom: 6px;
+  }
+  .design-modern .title { font-weight: 600; margin-bottom: 15px; }
+  .design-modern .section {
+    margin-bottom: 18px;
+    border-left: 4px solid currentColor;
+    padding-left: 12px;
+  }
+  .design-classic {
+    font-family: Georgia, serif;
+    background: #fffef8;
+    padding: 20px;
+    border: 1px solid #ccc;
+  }
+  .design-classic .name { font-weight: bold; font-style: italic; }
+  .design-classic .title { font-weight: 600; margin-bottom: 12px; }
+  .design-classic .muted { font-style: italic; }
+  .design-classic .section {
+    margin-bottom: 14px;
+    border-bottom: 1px dotted #ccc;
+    padding-bottom: 8px;
+  }
+  .remove-btn { background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 6px; cursor: pointer; border: none; }
+  .add-btn { background: #e6f9f0; color: #065f46; padding: 6px 10px; border-radius: 6px; cursor: pointer; border: none; }
+  /* Tag styles */
+  .tag-skills {
+    background-color: #bfdbfe; color: #1e40af;
+    display: inline-block; padding: 2px 6px; margin: 2px 4px 2px 0;
+    border-radius: 6px; font-size: 0.75rem;
+  }
+  .tag-certs {
+    background-color: #bbf7d0; color: #15803d;
+    display: inline-block; padding: 2px 6px; margin: 2px 4px 2px 0;
+    border-radius: 6px; font-size: 0.75rem;
+  }
+</style>
+</head>
+
+<body class="bg-gray-50 p-6">
+
+<!-- Password Login Section -->
+<div id="loginSection" style="text-align:center; margin-top:50px;">
+  <h2>Enter Password to Access</h2>
+  <input type="password" id="passwordInput" placeholder="Password" style="padding:8px; margin-top:10px;">
+  <button onclick="checkPassword()" style="padding:8px 12px;">Submit</button>
+  <p id="error" style="color:red; display:none; margin-top:10px;">Access Denied. Wrong password.</p>
+</div>
+
+<!-- Hidden content until password is correct -->
+<div id="content" style="display:none;">
+
+<!-- === START OF YOUR ORIGINAL BUILDER HTML === -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Nurse Resume Lab — Resume Builder</title>
+
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
+
 <style>
   .preview { width: 842px; max-width: 100%; }
   .preview .section { margin-bottom: 12px; }
@@ -95,17 +170,6 @@
 </head>
 <body class="bg-gray-50 p-6">
 
-<div id="loginSection">
-  <label>Enter Password: <input type="password" id="passwordInput" /></label>
-  <button onclick="checkPassword()">Submit</button>
-  <p id="error" style="color:red; display:none;">Access Denied. Wrong password.</p>
-</div>
-
-<div id="content" style="display:none;">
-  <!-- Your protected content goes here -->
-  <h1>Protected Content</h1>
-  <p>This content is only visible after correct password.</p>
-</div>
 
 
 <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -274,27 +338,6 @@ function escapeHtml(text) {
   return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function checkPassword() {
-  const passwordInput = document.getElementById('passwordInput');
-  const password = passwordInput.value;
-  const correctPassword = 'NURSELAB123'; // Change this
-  const content = document.getElementById('content');
-  const error = document.getElementById('error');
-  const loginSection = document.getElementById('loginSection');
-
-  if(password === correctPassword) {
-    content.style.display = 'block';
-    loginSection.style.display = 'none';
-    error.style.display = 'none';
-  } else {
-    content.style.display = 'none';
-    error.style.display = 'block';
-    passwordInput.value = '';
-    passwordInput.focus();
-  }
-}
-
-  
 function createWorkItem(data = {}) {
   const wrapper = document.createElement('div');
   wrapper.className = 'p-3 border rounded bg-gray-50 relative';
@@ -623,6 +666,32 @@ resumeFormElements.printBtn.addEventListener('click', () => {
   printWindow.print();
   printWindow.close();
 });
+</script>
+    
+<!-- === END OF YOUR ORIGINAL BUILDER HTML === -->
+
+</div> <!-- closes #content -->
+
+<script>
+function checkPassword() {
+  const passwordInput = document.getElementById('passwordInput');
+  const password = passwordInput.value;
+  const correctPassword = 'NURSELAB123'; // Change this to your desired password
+  const content = document.getElementById('content');
+  const error = document.getElementById('error');
+  const loginSection = document.getElementById('loginSection');
+
+  if (password === correctPassword) {
+    content.style.display = 'block';
+    loginSection.style.display = 'none';
+    error.style.display = 'none';
+  } else {
+    content.style.display = 'none';
+    error.style.display = 'block';
+    passwordInput.value = '';
+    passwordInput.focus();
+  }
+}
 </script>
 
 </body>
