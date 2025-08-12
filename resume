@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Nurse Resume Lab — Resume Builder</title>
+
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  .preview { width: 842px; max-width: 100%; }
+  .preview .section { margin-bottom: 12px; }
+  .preview .muted { color: #6b7280; font-size: 13px; }
+  .design-clean { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; color: #0f172a; }
+  .design-clean .name { font-size: 26px; font-weight: 700; }
+  .design-clean .title { color: #374151; }
+  .remove-btn { background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 6px; cursor: pointer; border: none; }
+  .add-btn { background: #e6f9f0; color: #065f46; padding: 6px 10px; border-radius: 6px; cursor: pointer; border: none; }
+</style>
+</head>
+<body class="bg-gray-50 p-6">
+
+<div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- LEFT: Form -->
+  <div class="p-4 bg-white rounded shadow">
+    <h2 class="text-2xl font-semibold mb-3">Build your custom resume</h2>
+    <p class="text-sm text-gray-600 mb-4">Fill fields — preview updates live. Add/remove entries as needed. When finished, download PDF.</p>
+
+    <div class="space-y-3">
+      <label class="block"><span class="text-sm font-medium">Full name</span>
+        <input id="fullName" class="mt-1 block w-full border rounded p-2" placeholder="Jane Doe" />
+      </label>
+
+      <label class="block"><span class="text-sm font-medium">Professional title</span>
+        <input id="title" class="mt-1 block w-full border rounded p-2" placeholder="Registered Nurse / Trauma Nurse" />
+      </label>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <label class="block"><span class="text-sm font-medium">Email</span>
+          <input id="email" type="email" class="mt-1 block w-full border rounded p-2" placeholder="you@example.com" />
+        </label>
+        <label class="block"><span class="text-sm font-medium">Phone</span>
+          <input id="phone" class="mt-1 block w-full border rounded p-2" placeholder="(555) 555-5555" />
+        </label>
+      </div>
+
+      <label class="block"><span class="text-sm font-medium">City / State</span>
+        <input id="cityState" class="mt-1 block w-full border rounded p-2" placeholder="Miami, FL" />
+      </label>
+
+      <label class="block"><span class="text-sm font-medium">Professional summary</span>
+        <textarea id="summary" rows="3" class="mt-1 block w-full border rounded p-2" placeholder="Brief overview of strengths & goals"></textarea>
+      </label>
+
+      <!-- Work Experience container -->
+      <div>
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Work Experience</h3>
+          <button id="addWorkBtn" type="button" class="add-btn">+ Add Work</button>
+        </div>
+        <div id="workList" class="space-y-3 mt-3"></div>
+      </div>
+
+      <!-- Education container -->
+      <div>
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Education</h3>
+          <button id="addEduBtn" type="button" class="add-btn">+ Add Education</button>
+        </div>
+        <div id="eduList" class="space-y-3 mt-3"></div>
+      </div>
+
+      <label class="block"><span class="text-sm font-medium">Skills (comma separated)</span>
+        <input id="skills" class="mt-1 block w-full border rounded p-2" placeholder="ACLS, BLS, IV, Critical Care" />
+      </label>
+
+      <label class="block"><span class="text-sm font-medium">Certifications (comma separated)</span>
+        <input id="certs" class="mt-1 block w-full border rounded p-2" placeholder="RN — State Board, BLS, ACLS" />
+      </label>
+
+      <div class="flex gap-3 mt-3">
+        <button id="downloadBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Download PDF</button>
+        <button id="printBtn" class="px-4 py-2 border rounded">Print</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Live Preview -->
+  <div class="p-4">
+    <h3 class="text-lg font-semibold mb-3">Live preview</h3>
+    <div id="resumePreview" class="bg-white p-6 rounded shadow preview design-clean" style="min-height:600px; font-family:Inter,sans-serif;">
+      <div class="flex justify-between items-start">
+        <div>
+          <div id="prevFullName" class="name" style="font-size:26px;font-weight:700;">Your Name</div>
+          <div id="prevTitle" class="title muted" style="color:#374151;margin-bottom:10px;">Professional Title</div>
+        </div>
+        <div class="text-sm text-right muted" style="color:#6b7280;font-size:13px;">
+          <div id="prevCityState"></div>
+          <div id="prevEmail"></div>
+          <div id="prevPhone"></div>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <section id="prevSummarySec" class="mb-4 hidden">
+        <h4 class="font-semibold">Summary</h4>
+        <div id="prevSummary" class="content"></div>
+      </section>
+
+      <section id="prevExperienceSec" class="mb-4 hidden">
+        <h4 class="font-semibold">Work Experience</h4>
+        <div id="prevExperience" class="content"></div>
+      </section>
+
+      <section id="prevEducationSec" class="mb-4 hidden">
+        <h4 class="font-semibold">Education</h4>
+        <div id="prevEducation" class="content"></div>
+      </section>
+
+      <section id="prevSkillsCertSec" class="mb-4 hidden">
+        <div class="grid grid-cols-2 gap-4">
+          <div id="skillsCol" class="hidden"><h4 class="font-semibold">Skills</h4><div id="prevSkills"></div></div>
+          <div id="certsCol" class="hidden"><h4 class="font-semibold">Certifications</h4><div id="prevCertifications"></div></div>
+        </div>
+      </section>
+
+      <div class="text-xs muted mt-6" style="color:#6b7280;">Generated by Nurse Resume Lab • <span id="year"></span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const workList = document.getElementById('workList');
+const eduList = document.getElementById('eduList');
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function createWorkItem(data = {}) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'p-3 border rounded bg-gray-50 relative';
+  wrapper.innerHTML = `
+    <div class="flex justify-between items-start gap-2">
+      <div class="flex-1">
+        <input data-field="title" placeholder="Job title" class="mb-2 block w-full p-2 border rounded" value="${escapeHtml(data.title||'')}" />
+        <input data-field="employer" placeholder="Employer" class="mb-2 block w-full p-2 border rounded" value="${escapeHtml(data.employer||'')}" />
+        <div class="grid grid-cols-2 gap-2">
+          <input data-field="start" placeholder="Start (MM/YYYY)" class="p-2 border rounded" value="${escapeHtml(data.start||'')}" />
+          <input data-field="end" placeholder="End (MM/YYYY or Present)" class="p-2 border rounded" value="${escapeHtml(data.end||'')}" />
+        </div>
+        <input data-field="cityState" placeholder="City, State" class="mt-2 block w-full p-2 border rounded" value="${escapeHtml(data.cityState||'')}" />
+        <textarea data-field="description" rows="3" placeholder="Description / achievements" class="mt-2 block w-full p-2 border rounded">${escapeHtml(data.description||'')}</textarea>
+      </div>
+      <div class="ml-2 flex flex-col items-end">
+        <button data-action="remove" class="remove-btn mb-2" type="button">Remove</button>
+      </div>
+    </div>
+  `;
+  wrapper.querySelector('[data-action="remove"]').addEventListener('click', () => {
+    wrapper.remove();
+    updatePreview();
+  });
+  wrapper.querySelectorAll('input,textarea').forEach(el => {
+    el.addEventListener('input', updatePreview);
+  });
+  return wrapper;
+}
+
+function createEduItem(data = {}) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'p-3 border rounded bg-gray-50 relative';
+  wrapper.innerHTML = `
+    <div class="flex justify-between items-start gap-2">
+      <div class="flex-1">
+        <input data-field="degree" placeholder="Degree / Certification" class="mb-2 block w-full p-2 border rounded" value="${escapeHtml(data.degree||'')}" />
+        <input data-field="institution" placeholder="Institution" class="mb-2 block w-full p-2 border rounded" value="${escapeHtml(data.institution||'')}" />
+        <div class="grid grid-cols-2 gap-2">
+          <input data-field="start" placeholder="Start (MM/YYYY)" class="p-2 border rounded" value="${escapeHtml(data.start||'')}" />
+          <input data-field="end" placeholder="End (MM/YYYY)" class="p-2 border rounded" value="${escapeHtml(data.end||'')}" />
+        </div>
+        <input data-field="cityState" placeholder="City, State" class="mt-2 block w-full p-2 border rounded" value="${escapeHtml(data.cityState||'')}" />
+        <textarea data-field="description" rows="2" placeholder="Description / honors" class="mt-2 block w-full p-2 border rounded">${escapeHtml(data.description||'')}</textarea>
+      </div>
+      <div class="ml-2 flex flex-col items-end">
+        <button data-action="remove" class="remove-btn mb-2" type="button">Remove</button>
+      </div>
+    </div>
+  `;
+  wrapper.querySelector('[data-action="remove"]').addEventListener('click', () => {
+    wrapper.remove();
+    updatePreview();
+  });
+  wrapper.querySelectorAll('input,textarea').forEach(el => {
+    el.addEventListener('input', updatePreview);
+  });
+  return wrapper;
+}
+
+function addInitialItems() {
+  for(let i=0; i<3; i++) workList.appendChild(createWorkItem());
+  for(let i=0; i<3; i++) eduList.appendChild(createEduItem());
+}
+
+addInitialItems();
+
+document.getElementById('addWorkBtn').addEventListener('click', () => {
+  const newItem = createWorkItem();
+  workList.appendChild(newItem);
+  newItem.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+document.getElementById('addEduBtn').addEventListener('click', () => {
+  const newItem = createEduItem();
+  eduList.appendChild(newItem);
+  newItem.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+const resumeFormElements = {
+  fullName: document.getElementById('fullName'),
+  title: document.getElementById('title'),
+  email: document.getElementById('email'),
+  phone: document.getElementById('phone'),
+  cityState: document.getElementById('cityState'),
+  summary: document.getElementById('summary'),
+  skills: document.getElementById('skills'),
+  certs: document.getElementById('certs'),
+  downloadBtn: document.getElementById('downloadBtn'),
+  printBtn: document.getElementById('printBtn'),
+  designSelect: document.getElementById('designSelect')
+};
+
+const preview = {
+  fullName: document.getElementById('prevFullName'),
+  title: document.getElementById('prevTitle'),
+  email: document.getElementById('prevEmail'),
+  phone: document.getElementById('prevPhone'),
+  cityState: document.getElementById('prevCityState'),
+  summarySec: document.getElementById('prevSummarySec'),
+  summary: document.getElementById('prevSummary'),
+  experienceSec: document.getElementById('prevExperienceSec'),
+  experience: document.getElementById('prevExperience'),
+  educationSec: document.getElementById('prevEducationSec'),
+  education: document.getElementById('prevEducation'),
+  skillsSec: document.getElementById('prevSkillsCertSec'),
+  skills: document.getElementById('prevSkills'),
+  certs: document.getElementById('prevCertifications'),
+  skillsCol: document.getElementById('skillsCol'),
+  certsCol: document.getElementById('certsCol'),
+  previewRoot: document.getElementById('resumePreview')
+};
+
+function updatePreview() {
+  preview.fullName.textContent = resumeFormElements.fullName.value.trim() || 'Your Name';
+  preview.title.textContent = resumeFormElements.title.value.trim() || 'Professional Title';
+  preview.email.textContent = resumeFormElements.email.value.trim();
+  preview.phone.textContent = resumeFormElements.phone.value.trim();
+  preview.cityState.textContent = resumeFormElements.cityState.value.trim();
+
+  // Summary
+  const summaryVal = resumeFormElements.summary.value.trim();
+  preview.summary.textContent = summaryVal;
+  preview.summarySec.classList.toggle('hidden', !summaryVal);
+
+  // Work Experience
+  const workNodes = Array.from(workList.children);
+  let workHtmlParts = [];
+  workNodes.forEach(node => {
+    const get = f => node.querySelector(`[data-field="${f}"]`)?.value.trim() || '';
+    const title = get('title');
+    const employer = get('employer');
+    const start = get('start');
+    const end = get('end');
+    const cityState = get('cityState');
+    const desc = get('description');
+
+    if (!title && !employer && !start && !end && !cityState && !desc) return;
+
+    let part = '<div class="section">';
+    if (title || employer) {
+      part += `<div><strong>${escapeHtml(title||'')}</strong>${title && employer ? ' — ' : ''}${escapeHtml(employer||'')}</div>`;
+    }
+    if (start || end || cityState) {
+      const period = [start||'', end||''].filter(Boolean).join(' – ');
+      part += `<div class="muted">${escapeHtml(period)}${(period && cityState) ? ', ' : ''}${escapeHtml(cityState||'')}</div>`;
+    }
+    if (desc) {
+      part += `<div style="margin-top:6px;">${escapeHtml(desc)}</div>`;
+    }
+    part += '</div>';
+    workHtmlParts.push(part);
+  });
+  preview.experience.innerHTML = workHtmlParts.join('');
+  preview.experienceSec.classList.toggle('hidden', workHtmlParts.length === 0);
+
+  // Education
+  const eduNodes = Array.from(eduList.children);
+  let eduHtmlParts = [];
+  eduNodes.forEach(node => {
+    const get = f => node.querySelector(`[data-field="${f}"]`)?.value.trim() || '';
+    const degree = get('degree');
+    const institution = get('institution');
+    const start = get('start');
+    const end = get('end');
+    const cityState = get('cityState');
+    const desc = get('description');
+
+    if (!degree && !institution && !start && !end && !cityState && !desc) return;
+
+    let part = '<div class="section">';
+    if (degree || institution) {
+      part += `<div><strong>${escapeHtml(degree||'')}</strong>${degree && institution ? ' — ' : ''}${escapeHtml(institution||'')}</div>`;
+    }
+    if (start || end || cityState) {
+      const period = [start||'', end||''].filter(Boolean).join(' – ');
+      part += `<div class="muted">${escapeHtml(period)}${(period && cityState) ? ', ' : ''}${escapeHtml(cityState||'')}</div>`;
+    }
+    if (desc) {
+      part += `<div style="margin-top:6px;">${escapeHtml(desc)}</div>`;
+    }
+    part += '</div>';
+    eduHtmlParts.push(part);
+  });
+  preview.education.innerHTML = eduHtmlParts.join('');
+  preview.educationSec.classList.toggle('hidden', eduHtmlParts.length === 0);
+
+  // Skills & Certifications
+  const skillsArr = resumeFormElements.skills.value.split(',').map(s=>s.trim()).filter(Boolean);
+  const certsArr = resumeFormElements.certs.value.split(',').map(s=>s.trim()).filter(Boolean);
+
+  if (skillsArr.length) {
+    preview.skills.innerHTML = skillsArr.map(s => `<div>• ${escapeHtml(s)}</div>`).join('');
+    preview.skillsCol.classList.remove('hidden');
+  } else {
+    preview.skillsCol.classList.add('hidden');
+  }
+
+  if (certsArr.length) {
+    preview.certs.innerHTML = certsArr.map(s => `<div>• ${escapeHtml(s)}</div>`).join('');
+    preview.certsCol.classList.remove('hidden');
+  } else {
+    preview.certsCol.classList.add('hidden');
+  }
+
+  preview.skillsSec.classList.toggle('hidden', !skillsArr.length && !certsArr.length);
+}
+
+// Attach main inputs event listeners
+Object.values(resumeFormElements).forEach(el => {
+  if (el && el.tagName !== 'BUTTON') el.addEventListener('input', updatePreview);
+});
+
+// Initial render
+updatePreview();
+
+document.getElementById('downloadBtn').addEventListener('click', async () => {
+  const previewRoot = preview.previewRoot;
+  previewRoot.scrollTop = 0;
+
+  const canvas = await html2canvas(previewRoot, { scale: 2 });
+  const imgData = canvas.toDataURL('image/png');
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'pt', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 20;
+  const imgWidth = pageWidth - margin * 2;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = margin;
+
+  pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    pdf.addPage();
+    position = heightLeft - imgHeight + margin;
+    pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  pdf.save((resumeFormElements.fullName.value.trim() || 'resume') + '-nurse.pdf');
+});
+
+document.getElementById('printBtn').addEventListener('click', () => {
+  const printWindow = window.open('', '_blank', 'width=900,height=700');
+  if (!printWindow) {
+    alert('Pop-up blocked! Please allow pop-ups and try again.');
+    return;
+  }
+  printWindow.document.write('<html><head><title>Print Resume</title>');
+  printWindow.document.write('<style>body{font-family:Inter,sans-serif;margin:40px;} .name{font-size:26px;font-weight:700;} .title{color:#374151;margin-bottom:10px;} .muted{color:#6b7280;font-size:13px;} .section{margin-bottom:12px;} h4{font-weight:600;margin-bottom:8px;}</style>');
+  printWindow.document.write('</head><body>');
+  printWindow.document.write(preview.previewRoot.innerHTML);
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+});
+</script>
+
+</body>
+</html>
