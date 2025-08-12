@@ -10,6 +10,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+#content { display: none; }
+#error { color: red; display: none; margin-top: 10px; }
+
+  
 <style>
   .preview { width: 842px; max-width: 100%; }
   .preview .section { margin-bottom: 12px; }
@@ -90,13 +94,17 @@
 </head>
 <body class="bg-gray-50 p-6">
 
-<script>
-  const password = "NURSELAB123"; // change to your password
-  const userPass = prompt("Enter password to view this page:");
-  if(userPass !== password) {
-    document.body.innerHTML = "<h2>Access denied</h2>";
-  }
-</script>
+<div id="loginSection">
+  <label>Enter Password: <input type="password" id="passwordInput" /></label>
+  <button onclick="checkPassword()">Submit</button>
+  <p id="error" style="color:red; display:none;">Access Denied. Wrong password.</p>
+</div>
+
+<div id="content" style="display:none;">
+  <!-- Your protected content goes here -->
+  <h1>Protected Content</h1>
+  <p>This content is only visible after correct password.</p>
+</div>
 
 
 <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -265,6 +273,27 @@ function escapeHtml(text) {
   return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function checkPassword() {
+  const passwordInput = document.getElementById('passwordInput');
+  const password = passwordInput.value;
+  const correctPassword = 'NURSELAB123'; // Change this
+  const content = document.getElementById('content');
+  const error = document.getElementById('error');
+  const loginSection = document.getElementById('loginSection');
+
+  if(password === correctPassword) {
+    content.style.display = 'block';
+    loginSection.style.display = 'none';
+    error.style.display = 'none';
+  } else {
+    content.style.display = 'none';
+    error.style.display = 'block';
+    passwordInput.value = '';
+    passwordInput.focus();
+  }
+}
+
+  
 function createWorkItem(data = {}) {
   const wrapper = document.createElement('div');
   wrapper.className = 'p-3 border rounded bg-gray-50 relative';
